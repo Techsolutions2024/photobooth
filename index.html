@@ -164,49 +164,13 @@
     </div>
 
     <script>
-        // Test data - sẽ được thay thế bằng dữ liệu thực từ URL hoặc localStorage
-        const testData = {
-            "session_id": "20250916_175728",
-            "created_at": "2025-09-16T17:59:47.269347",
-            "total_photos": 7,
-            "photos": [
-                {
-                    "filename": "captured_photo_1.png",
-                    "public_id": "cbl0lyihue6irgx4w9wn",
-                    "url": "https://res.cloudinary.com/dijzqrcju/image/upload/v1758020378/cbl0lyihue6irgx4w9wn.png"
-                },
-                {
-                    "filename": "captured_photo_2.png",
-                    "public_id": "sg6kzclc7bq9l2qnjfri",
-                    "url": "https://res.cloudinary.com/dijzqrcju/image/upload/v1758020379/sg6kzclc7bq9l2qnjfri.png"
-                },
-                {
-                    "filename": "captured_photo_3.png",
-                    "public_id": "ws8omvjroi5qop7dvde0",
-                    "url": "https://res.cloudinary.com/dijzqrcju/image/upload/v1758020380/ws8omvjroi5qop7dvde0.png"
-                },
-                {
-                    "filename": "captured_photo_4.png",
-                    "public_id": "uiv4c8umkv0ccwjtzw22",
-                    "url": "https://res.cloudinary.com/dijzqrcju/image/upload/v1758020381/uiv4c8umkv0ccwjtzw22.png"
-                },
-                {
-                    "filename": "captured_photo_5.png",
-                    "public_id": "nhirvty4vnvkhexzrxad",
-                    "url": "https://res.cloudinary.com/dijzqrcju/image/upload/v1758020381/nhirvty4vnvkhexzrxad.png"
-                },
-                {
-                    "filename": "captured_photo_6.png",
-                    "public_id": "l37s7bx0l3q2ih1syrdb",
-                    "url": "https://res.cloudinary.com/dijzqrcju/image/upload/v1758020382/l37s7bx0l3q2ih1syrdb.png"
-                },
-                {
-                    "filename": "photobooth_preview_goc_no_frame_20250916_175933.png",
-                    "public_id": "jpbdcixplqbb6ljnhahf",
-                    "url": "https://res.cloudinary.com/dijzqrcju/image/upload/v1758020383/jpbdcixplqbb6ljnhahf.png"
-                }
-            ]
-        };
+        // Test data - chỉ dùng khi không có dữ liệu thực
+        const getDefaultTestData = () => ({
+            "session_id": "demo_session",
+            "created_at": new Date().toISOString(),
+            "total_photos": 0,
+            "photos": []
+        });
 
         function getDisplayName(filename) {
             const nameMapping = {
@@ -275,10 +239,10 @@
                 }
             }
             
-            // Fallback to test data if no data found
+            // Fallback to default data if no data found
             if (!galleryData) {
-                console.log('Using test data as fallback');
-                galleryData = testData;
+                console.log('No gallery data found, showing empty gallery');
+                galleryData = getDefaultTestData();
             }
             
             return galleryData;
@@ -296,6 +260,12 @@
             loading.style.display = 'none';
             
             if (!galleryData || !galleryData.photos || galleryData.photos.length === 0) {
+                // Hiển thị thông báo không có ảnh thay vì error
+                error.innerHTML = `
+                    <h2>📷 Chưa có ảnh nào</h2>
+                    <p>Session này chưa có ảnh hoặc dữ liệu chưa được tải lên.</p>
+                    <p>Vui lòng thử lại sau hoặc liên hệ quản trị viên.</p>
+                `;
                 error.style.display = 'block';
                 return;
             }
