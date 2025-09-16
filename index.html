@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenue Dashboard - Realtime Database</title>
+    
+    <!-- Firebase v9 SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+        
+        // Firebase Configuration - chỉ cần databaseURL cho Realtime Database
+        const firebaseConfig = {
+            databaseURL: "https://test-cf174-default-rtdb.firebaseio.com/"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Global variables
+        let revenueData = null;
+
+        // Utility functions
+        window.formatCurrency = function(amount) {
+            return new Intl.NumberFormat('vi-VN').format(amount) + ' VNĐ';
+        }
+
+        window.formatDate = function(dateString) {
+            return new Date(dateString).toLocaleDateString('vi-VN');
+        }
+
+        window.formatTime = function(timeString) {
+            return timeString || '--:--:--';
+        }
+
+        function showLoading() {
+            document.getElementById('loadingScreen').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').classList.remove('hidden');
+            document.getElementById('errorText').textContent = message;
+            document.getElementById('connectionStatus').className = 'status-dot status-offline';
+            document.getElementById('connectionText').textContent = 'Mất kết nối';
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').classList.add('hidden');
+            document.getElementById('connectionStatus').className = 'status-dot status-online';
+            document.getElementById('connectionText').textContent = 'Đã kết nối';
+        }
+
+        // Load data from Firebase Realtime Database
+        function loadRevenueData() {
+            showLoading();
+            
+            const revenueRef = ref(database, 'revenue_data');
+            
+            onValue(revenueRef, (snapshot) => {
+                try {
+                    const data = snapshot.val();
+                    if (data) {
+                        revenueData = data;
+                        updateUI(data);
+                        hideError();
+                        hideLoading();
+                        console.log('✅ Data loaded successfully:', data);
+                    } else {
+                        throw new Error('Không có dữ liệu trong Firebase Realtime Database');
+                    }
+                } catch (error) {
+                    showError('Lỗi khi xử lý dữ liệu: ' + error.message);
+                    hideLoading();
+                    console.error('❌ Error processing data:', error);
+                }
+            }, (error) => {
+                showError('Lỗi kết nối Firebase: ' + error.message);
+                hideLoading();
+                console.error('❌ Firebase connection error:', error);
+            });
+        }
+
+        // Update UI with data
+        function updateUI(data) {
+            console.log('🔄 Updating UI with data:', data);
+            
+            // Update stats
+            document.getElementById('totalRevenue').textContent = formatCurrency(data.total_revenue || 0);
+            document.getElementById('totalSessions').textContent = (data.sessions || []).length;
+
+            // Get today's date
+            const today = new Date().toISOString().split('T')[0];
+            const thisMonth = new Date().toISOString().substring(0, 7);
+
+            // Today's revenue
+            const todayData = data.daily_summary && data.daily_summary[today];
+            document.getElementById('todayRevenue').textContent = formatCurrency(todayData ? todayData.total : 0);
+
+            // This month's revenue
+            const thisMonthData = data.monthly_summary && data.monthly_summary[thisMonth];
+            document.getElementById('thisMonthRevenue').textContent = formatCurrency(thisMonthData ? thisMonthData.total : 0);
+
+            // Update recent sessions
+            updateRecentSessions(data.sessions || []);
+
+            // Update last updated
+            const lastUpdated = data.last_updated || data.firebase_sync_timestamp || data.metadata?.firebase_sync_timestamp;
+            if (lastUpdated) {
+                document.getElementById('lastUpdated').textContent = new Date(lastUpdated).toLocaleString('vi-VN');
+            }
+
+            // Update daily summary
+            updateDailySummary(data.daily_summary || {});
+        }
+
+        // Update recent sessions
+        function updateRecentSessions(sessions) {
+            const tbody = document.getElementById('recentSessions');
+            tbody.innerHTML = '';
+
+            const recentSessions = sessions.slice(-15).reverse();
+
+            recentSessions.forEach(session => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-white/10 hover:bg-white/5 transition-colors';
+                row.innerHTML = `
+                    <td class="py-3 px-4 text-white">${formatTime(session.time)}</td>
+                    <td class="py-3 px-4 text-white/80">${formatDate(session.date)}</td>
+                    <td class="py-3 px-4 text-right text-white font-medium">${formatCurrency(session.amount)}</td>
+                    <td class="py-3 px-4 text-white/60 text-sm">${session.day_of_week || ''}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            if (recentSessions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="py-8 text-center text-white/60">Chưa có phiên nào</td></tr>';
+            }
+        }
+
+        // Update daily summary
+        function updateDailySummary(dailyData) {
+            const container = document.getElementById('dailySummaryContainer');
+            container.innerHTML = '';
+
+            const sortedDays = Object.keys(dailyData).sort().reverse().slice(0, 10);
+
+            if (sortedDays.length === 0) {
+                container.innerHTML = '<p class="text-white/60 text-center py-4">Chưa có dữ liệu theo ngày</p>';
+                return;
+            }
+
+            sortedDays.forEach(date => {
+                const dayData = dailyData[date];
+                const dayCard = document.createElement('div');
+                dayCard.className = 'glass-card p-4 hover:bg-white/10 transition-all duration-200';
+                dayCard.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-white font-medium">${formatDate(date)}</h4>
+                        <span class="text-white/70 text-sm">${dayData.day_of_week || ''}</span>
+                    </div>
+                    <div class="text-2xl font-bold text-white mb-1">${formatCurrency(dayData.total)}</div>
+                    <div class="text-white/60 text-sm">${dayData.count} phiên</div>
+                `;
+                container.appendChild(dayCard);
+            });
+        }
+
+        // Refresh data function
+        window.refreshData = function() {
+            console.log('🔄 Refreshing data...');
+            loadRevenueData();
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing Revenue Dashboard...');
+            loadRevenueData();
+        });
+
+        // Export functions to global scope for debugging
+        window.loadRevenueData = loadRevenueData;
+        window.revenueData = () => revenueData;
+    </script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-online { background-color: #10b981; }
+        .status-offline { background-color: #ef4444; }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-4">
+        <!-- Header -->
+        <div class="max-w-7xl mx-auto mb-8">
+            <div class="glass-card p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white mb-2">💰 Revenue Dashboard</h1>
+                        <p class="text-white/70">Bảng điều khiển doanh thu - Firebase Realtime Database</p>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex items-center space-x-4">
+                        <div class="flex items-center text-white/80">
+                            <span class="status-dot" id="connectionStatus"></span>
+                            <span id="connectionText">Đang kết nối...</span>
+                        </div>
+                        <button onclick="refreshData()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-all duration-200">
+                            🔄 Làm mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Screen -->
+        <div id="loadingScreen" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div class="glass-card p-8 text-center">
+                <div class="loading-spinner mx-auto mb-4"></div>
+                <p class="text-white text-lg">Đang tải dữ liệu từ Firebase...</p>
+                <p class="text-white/60 text-sm mt-2">Realtime Database</p>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="max-w-7xl mx-auto mb-6 hidden">
+            <div class="bg-red-500/20 border border-red-500/30 rounded-lg p-4 text-white">
+                <div class="flex items-center">
+                    <span class="text-2xl mr-3">⚠️</span>
+                    <div>
+                        <h3 class="font-semibold">Lỗi kết nối Firebase</h3>
+                        <p id="errorText" class="text-sm text-white/80"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent" class="max-w-7xl mx-auto space-y-6" style="display: none;">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="glass-card p-6 stat-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-white/70 text-sm font-medium">Tổng Doanh Thu</p>
+                            <p id="totalRevenue" class="text-2xl font-bold text-white">0 VNĐ</p>
+                        </div>
+                        <div class="text-4xl">💰</div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 stat-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-white/70 text-sm font-medium">Tổng Phiên</p>
+                            <p id="totalSessions" class="text-2xl font-bold text-white">0</p>
+                        </div>
+                        <div class="text-4xl">📊</div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 stat-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-white/70 text-sm font-medium">Hôm Nay</p>
+                            <p id="todayRevenue" class="text-2xl font-bold text-white">0 VNĐ</p>
+                        </div>
+                        <div class="text-4xl">📅</div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6 stat-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-white/70 text-sm font-medium">Tháng Này</p>
+                            <p id="thisMonthRevenue" class="text-2xl font-bold text-white">0 VNĐ</p>
+                        </div>
+                        <div class="text-4xl">📈</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Summary -->
+            <div class="glass-card p-6">
+                <h3 class="text-xl font-semibold text-white mb-4">📊 Doanh Thu Theo Ngày (10 ngày gần nhất)</h3>
+                <div id="dailySummaryContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <!-- Daily summary cards will be populated here -->
+                </div>
+            </div>
+
+            <!-- Recent Sessions -->
+            <div class="glass-card p-6">
+                <h3 class="text-xl font-semibold text-white mb-4">🕐 Phiên Gần Đây (15 phiên mới nhất)</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-white/20">
+                                <th class="text-left text-white/70 font-medium py-3 px-4">Thời Gian</th>
+                                <th class="text-left text-white/70 font-medium py-3 px-4">Ngày</th>
+                                <th class="text-right text-white/70 font-medium py-3 px-4">Số Tiền</th>
+                                <th class="text-left text-white/70 font-medium py-3 px-4">Thứ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentSessions">
+                            <!-- Sessions will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Connection Info -->
+            <div class="glass-card p-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div>
+                        <p class="text-white/60 text-sm">
+                            🔥 Kết nối: Firebase Realtime Database
+                        </p>
+                        <p class="text-white/60 text-sm">
+                            📡 Database: test-cf174-default-rtdb.firebaseio.com
+                        </p>
+                    </div>
+                    <div class="mt-2 md:mt-0">
+                        <p class="text-white/60 text-sm">
+                            Cập nhật lần cuối: <span id="lastUpdated" class="font-medium">--</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debug Console (chỉ hiển thị khi cần) -->
+    <div id="debugConsole" class="fixed bottom-4 right-4 hidden">
+        <div class="glass-card p-4 max-w-sm">
+            <h4 class="text-white font-medium mb-2">🐛 Debug</h4>
+            <button onclick="console.log('Current data:', window.revenueData())" 
+                    class="bg-white/20 text-white px-3 py-1 rounded text-sm">
+                Log Data
+            </button>
+        </div>
+    </div>
+</body>
+</html>
