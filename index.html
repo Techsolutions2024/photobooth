@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3E2C19 0%, #5A4A3A 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -25,28 +25,34 @@
 
         .header {
             text-align: center;
-            color: white;
+            color: #CAB394;
             margin-bottom: 40px;
         }
 
         .header h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .header .session-id {
+            font-size: 1.5rem;
+            opacity: 0.9;
         }
 
         .loading {
             text-align: center;
-            color: white;
+            color: #CAB394;
             font-size: 1.2rem;
             padding: 60px 20px;
         }
 
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid white;
+            border: 4px solid rgba(202, 179, 148, 0.3);
+            border-top: 4px solid #CAB394;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite;
             margin: 20px auto;
         }
@@ -59,43 +65,93 @@
         .error {
             background: #ff4444;
             color: white;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 30px;
+            border-radius: 15px;
             text-align: center;
-            margin: 20px 0;
+            margin: 40px auto;
+            max-width: 600px;
+            font-size: 1.1rem;
+        }
+
+        .btn-download-all {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 40px;
+            padding: 20px;
+            font-size: 1.2rem;
+            background: #CAB394;
+            color: #3E2C19;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-download-all:hover {
+            background: #D4C4A4;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 25px rgba(0,0,0,0.4);
+        }
+
+        .btn-download-all:disabled {
+            background: #8B7D6B;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .photobooth-main {
             background: white;
-            border-radius: 15px;
+            border-radius: 20px;
             padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        .photobooth-main h2 {
+            color: #3E2C19;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
         }
 
         .photobooth-main img {
             width: 100%;
             height: auto;
             border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .photos-section {
+            margin-top: 40px;
+        }
+
+        .photos-section h2 {
+            color: #CAB394;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
         }
 
         .photos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
 
         .photo-card {
             background: white;
-            border-radius: 10px;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
             transition: transform 0.3s;
         }
 
         .photo-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         }
 
         .photo-card img {
@@ -105,34 +161,38 @@
         }
 
         .photo-actions {
-            padding: 15px;
+            padding: 20px;
             text-align: center;
         }
 
-        .btn {
+        .btn-download {
             display: inline-block;
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
+            padding: 12px 30px;
+            background: #3E2C19;
+            color: #CAB394;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             border: none;
             cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
         }
 
-        .btn:hover {
-            background: #5568d3;
+        .btn-download:hover {
+            background: #2A1E11;
+            transform: scale(1.05);
         }
 
-        .btn-download-all {
-            display: block;
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto 20px;
-            padding: 15px;
-            font-size: 16px;
+        .footer {
+            text-align: center;
+            color: #CAB394;
+            padding: 40px 20px;
+            font-size: 1.1rem;
+        }
+
+        .footer p {
+            margin: 10px 0;
         }
 
         @media (max-width: 768px) {
@@ -143,6 +203,10 @@
             .photos-grid {
                 grid-template-columns: 1fr;
             }
+
+            .btn-download-all {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -150,23 +214,33 @@
     <div class="container">
         <div class="header">
             <h1>📸 Photobooth Gallery</h1>
-            <p id="session-title">Session #</p>
+            <p class="session-id" id="session-title">Loading...</p>
         </div>
 
         <div id="loading" class="loading">
             <div class="spinner"></div>
             <p>Đang tải ảnh của bạn...</p>
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">Loading your photos...</p>
         </div>
 
         <div id="error" class="error" style="display: none;"></div>
 
         <div id="content" style="display: none;">
-            <button id="downloadAll" class="btn btn-download-all">
-                ⬇️ Tải xuống tất cả ảnh
+            <button id="downloadAll" class="btn-download-all">
+                ⬇️ Tải xuống tất cả ảnh / Download All Photos
             </button>
 
             <div id="photobooth-container"></div>
-            <div id="photos-grid" class="photos-grid"></div>
+            
+            <div class="photos-section">
+                <h2>Ảnh riêng lẻ / Individual Photos</h2>
+                <div id="photos-grid" class="photos-grid"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>✨ Cảm ơn bạn đã sử dụng dịch vụ Photobooth!</p>
+            <p style="font-size: 0.9rem;">Thank you for using our Photobooth service!</p>
         </div>
     </div>
 
@@ -177,33 +251,58 @@
         // Cloudinary config
         const CLOUD_NAME = 'dmo42iyl6';
         
-        // Lấy session ID từ URL (ví dụ: ?session=29 hoặc /session/29)
+        // Lấy session ID từ URL
         function getSessionId() {
+            // Thử từ path: /session/29
+            const pathMatch = window.location.pathname.match(/\/session\/(\d+)/);
+            if (pathMatch) return pathMatch[1];
+            
+            // Thử từ query: ?session=29
             const urlParams = new URLSearchParams(window.location.search);
             const sessionParam = urlParams.get('session');
-            
             if (sessionParam) return sessionParam;
             
-            // Hoặc từ path: /session/29
-            const pathMatch = window.location.pathname.match(/\/session\/(\d+)/);
-            return pathMatch ? pathMatch[1] : null;
+            return null;
         }
 
-        // Fetch ảnh từ Cloudinary
+        // Fetch ảnh từ Cloudinary bằng Admin API hoặc fallback sang URL trực tiếp
         async function fetchSessionImages(sessionId) {
             try {
-                // Sử dụng Cloudinary API để search
+                // Thử search API trước
                 const searchUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/session${sessionId}.json`;
                 const response = await fetch(searchUrl);
                 
-                if (!response.ok) {
-                    throw new Error('Session không tồn tại');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.resources && data.resources.length > 0) {
+                        return data.resources;
+                    }
                 }
                 
-                const data = await response.json();
-                return data.resources || [];
+                // Fallback: Tạo URLs trực tiếp dựa vào convention
+                console.log('Fallback to direct URLs');
+                const images = [];
+                
+                // Photobooth image
+                images.push({
+                    public_id: `photobooth/session${sessionId}/photobooth_latest`,
+                    format: 'jpg',
+                    type: 'photobooth'
+                });
+                
+                // Individual photos
+                for (let i = 1; i <= 4; i++) {
+                    images.push({
+                        public_id: `photobooth/session${sessionId}/photo${i}_latest`,
+                        format: 'jpg',
+                        type: `photo${i}`
+                    });
+                }
+                
+                return images;
+                
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error fetching images:', error);
                 throw error;
             }
         }
@@ -213,18 +312,23 @@
             document.getElementById('session-title').textContent = `Session #${sessionId}`;
             
             // Phân loại ảnh
-            const photobooth = images.find(img => img.public_id.includes('photobooth'));
-            const photos = images.filter(img => !img.public_id.includes('photobooth'));
+            const photobooth = images.find(img => 
+                img.public_id.includes('photobooth') || img.type === 'photobooth'
+            );
+            const photos = images.filter(img => 
+                !img.public_id.includes('photobooth') && img.type !== 'photobooth'
+            );
             
             // Hiển thị photobooth chính
             if (photobooth) {
-                const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${photobooth.public_id}.${photobooth.format}`;
+                const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${photobooth.public_id}.${photobooth.format || 'jpg'}`;
                 document.getElementById('photobooth-container').innerHTML = `
                     <div class="photobooth-main">
-                        <img src="${url}" alt="Photobooth Layout">
+                        <h2>Photobooth Layout (4-in-1)</h2>
+                        <img src="${url}" alt="Photobooth Layout" onerror="this.style.display='none'">
                         <div class="photo-actions">
-                            <a href="${url}" download="photobooth_session${sessionId}.jpg" class="btn">
-                                ⬇️ Tải xuống
+                            <a href="${url}" download="photobooth_session${sessionId}.jpg" class="btn-download">
+                                ⬇️ Tải ảnh này / Download
                             </a>
                         </div>
                     </div>
@@ -233,13 +337,13 @@
             
             // Hiển thị các ảnh đơn
             const photosHtml = photos.map((photo, index) => {
-                const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${photo.public_id}.${photo.format}`;
+                const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${photo.public_id}.${photo.format || 'jpg'}`;
                 return `
                     <div class="photo-card">
-                        <img src="${url}" alt="Photo ${index + 1}">
+                        <img src="${url}" alt="Photo ${index + 1}" onerror="this.style.display='none'">
                         <div class="photo-actions">
-                            <a href="${url}" download="photo${index + 1}_session${sessionId}.jpg" class="btn">
-                                ⬇️ Tải
+                            <a href="${url}" download="photo${index + 1}_session${sessionId}.jpg" class="btn-download">
+                                ⬇️ Tải / Download
                             </a>
                         </div>
                     </div>
@@ -258,33 +362,50 @@
             
             btn.onclick = async () => {
                 btn.disabled = true;
-                btn.textContent = '⏳ Đang tải...';
+                btn.textContent = '⏳ Đang tải... / Downloading...';
                 
                 try {
                     const zip = new JSZip();
+                    let successCount = 0;
                     
                     for (let i = 0; i < images.length; i++) {
                         const img = images[i];
-                        const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${img.public_id}.${img.format}`;
-                        const response = await fetch(url);
-                        const blob = await response.blob();
-                        const filename = img.public_id.includes('photobooth') 
-                            ? `photobooth_session${sessionId}.jpg`
-                            : `photo${i + 1}_session${sessionId}.jpg`;
-                        zip.file(filename, blob);
+                        const url = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${img.public_id}.${img.format || 'jpg'}`;
+                        
+                        try {
+                            const response = await fetch(url);
+                            if (response.ok) {
+                                const blob = await response.blob();
+                                const filename = img.public_id.includes('photobooth') 
+                                    ? `photobooth_session${sessionId}.jpg`
+                                    : `photo${i}_session${sessionId}.jpg`;
+                                zip.file(filename, blob);
+                                successCount++;
+                            }
+                        } catch (err) {
+                            console.error(`Failed to download ${url}:`, err);
+                        }
                     }
                     
-                    const content = await zip.generateAsync({type: 'blob'});
-                    saveAs(content, `photobooth_session${sessionId}.zip`);
-                    
-                    btn.textContent = '✅ Đã tải xong!';
+                    if (successCount > 0) {
+                        const content = await zip.generateAsync({type: 'blob'});
+                        saveAs(content, `photobooth_session${sessionId}.zip`);
+                        
+                        btn.textContent = `✅ Đã tải ${successCount} ảnh! / Downloaded ${successCount} photos!`;
+                        setTimeout(() => {
+                            btn.disabled = false;
+                            btn.textContent = '⬇️ Tải xuống tất cả ảnh / Download All Photos';
+                        }, 3000);
+                    } else {
+                        throw new Error('Không thể tải ảnh nào');
+                    }
+                } catch (error) {
+                    console.error('Download error:', error);
+                    btn.textContent = '❌ Lỗi tải xuống / Download Error';
                     setTimeout(() => {
                         btn.disabled = false;
-                        btn.textContent = '⬇️ Tải xuống tất cả ảnh';
+                        btn.textContent = '⬇️ Tải xuống tất cả ảnh / Download All Photos';
                     }, 2000);
-                } catch (error) {
-                    btn.textContent = '❌ Lỗi tải xuống';
-                    btn.disabled = false;
                 }
             };
         }
@@ -301,15 +422,17 @@
             const sessionId = getSessionId();
             
             if (!sessionId) {
-                showError('❌ Không tìm thấy session ID. Vui lòng quét lại QR code.');
+                showError('❌ Không tìm thấy session ID. Vui lòng quét lại QR code.\n\nSession ID not found. Please scan the QR code again.');
                 return;
             }
+            
+            console.log(`Loading session ${sessionId}...`);
             
             try {
                 const images = await fetchSessionImages(sessionId);
                 
                 if (images.length === 0) {
-                    showError('❌ Không tìm thấy ảnh cho session này.');
+                    showError('❌ Không tìm thấy ảnh cho session này.\n\nNo photos found for this session.');
                     return;
                 }
                 
@@ -318,8 +441,11 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
                 
+                console.log(`✅ Loaded ${images.length} images for session ${sessionId}`);
+                
             } catch (error) {
-                showError('❌ Lỗi tải ảnh: ' + error.message);
+                console.error('Error:', error);
+                showError('❌ Lỗi tải ảnh: ' + error.message + '\n\nError loading photos. Please try again.');
             }
         }
 
