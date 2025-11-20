@@ -3,207 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📸 Photobooth Gallery</title>
+    <title>Photobooth Gallery</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            background-color: #3E2C19;
+            color: #CAB394;
             min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding-bottom: 60px;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
-        .loading {
-            text-align: center;
-            color: white;
-            font-size: 1.2rem;
-            padding: 60px 20px;
-        }
-
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error {
-            background: #ff4444;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .gallery-card {
-            background: rgba(0,0,0,0.25);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            color: white;
-            backdrop-filter: blur(5px);
-        }
-
-        .photobooth-preview {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            min-height: 400px;
-            margin-bottom: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+            padding: 40px 20px;
         }
-
-        .photobooth-preview img {
-            max-width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+        h1 {
+            font-size: 64px;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
         }
-
-        .photos-grid {
+        .loading, .error {
+            color: #CAB394;
+            margin-top: 40px;
+            font-size: 18px;
+            text-align: center;
+        }
+        .error { color: #ff9b8a; }
+        .gallery {
+            width: 100%;
+            max-width: 1200px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 24px;
         }
-
         .photo-card {
-            background: white;
-            border-radius: 20px;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(202,179,148,0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.35);
         }
-
         .photo-card img {
             width: 100%;
             display: block;
         }
-
-        .photo-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 30px 50px rgba(0,0,0,0.35);
-        }
-
-        .photo-actions {
-            padding: 20px;
-            text-align: center;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 28px;
-            background: #cab394;
-            color: #3E2C19;
-            text-decoration: none;
-            border-radius: 999px;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 10px 25px rgba(202, 179, 148, 0.35);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(202, 179, 148, 0.5);
-        }
-
-        .section-title {
-            font-size: 1.6rem;
-            margin-bottom: 20px;
-            font-weight: 700;
-            color: #ffe8c1;
-            text-align: center;
-        }
-
-        @media (max-width: 768px) {
-            .photobooth-preview {
-                min-height: 200px;
-            }
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📸 Photobooth Gallery</h1>
-            <p id="session-title">Session #</p>
-        </div>
+    <h1>Photobooth Gallery</h1>
 
-        <div id="loading" class="loading">
-            <div class="spinner"></div>
-            <p>Đang tải ảnh của bạn...</p>
-        </div>
-
-        <div id="error" class="error" style="display: none;"></div>
-
-        <div id="content" style="display: none;">
-            <div class="gallery-card">
-                <button id="downloadAll" class="btn" style="margin: 0 auto 30px; display: block; max-width: 360px; width: 100%; justify-content: center;">
-                    ⬇️ Tải xuống tất cả ảnh / Download All Photos
-                </button>
-
-                <h2 class="section-title">Photobooth Layout (4-in-1)</h2>
-                <div id="photobooth-container" class="photobooth-preview"></div>
-            </div>
-
-            <div class="gallery-card">
-                <h2 class="section-title">Ảnh riêng lẻ / Individual Photos</h2>
-                <div id="photos-grid" class="photos-grid"></div>
-            </div>
-
-            <p style="text-align:center; color:white; opacity:0.85; margin-top:30px;">
-                🌟 Cảm ơn bạn đã sử dụng dịch vụ Photobooth! / Thank you for using our Photobooth!
-            </p>
-        </div>
+    <div id="loading" class="loading">
+        Đang tải ảnh của bạn...
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    
+    <div id="error" class="error" style="display: none;"></div>
+
+    <div id="content" style="display: none;">
+        <div id="photos-grid" class="gallery"></div>
+    </div>
+
     <script>
         const CLOUD_NAME = 'dmo42iyl6';
         const MANIFEST_BASE = `https://res.cloudinary.com/${CLOUD_NAME}/raw/upload/photobooth`;
@@ -226,86 +88,20 @@
         }
 
         function displayImages(manifest) {
-            const { session_id, photobooth, photos } = manifest;
-            document.getElementById('session-title').textContent = `Session #${session_id}`;
-
-            if (photobooth) {
-                document.getElementById('photobooth-container').innerHTML = `
-                    <div style="text-align:center;">
-                        <img src="${photobooth}" alt="Photobooth Layout" loading="lazy">
-                    </div>
-                    <div class="photo-actions">
-                        <a href="${photobooth}" download="photobooth_session${session_id}.jpg" class="btn">
-                            ⬇️ Tải ảnh này / Download
-                        </a>
-                    </div>
-                `;
-            } else {
-                document.getElementById('photobooth-container').innerHTML = `
-                    <p style="color:#3E2C19;">Không tìm thấy layout photobooth cho session này.</p>
-                `;
-            }
-
             const photosGrid = document.getElementById('photos-grid');
-            if (!photos || photos.length === 0) {
-                photosGrid.innerHTML = `<p style="color:white; text-align:center;">Không tìm thấy ảnh đơn lẻ.</p>`;
+            const photos = manifest.photos || [];
+
+            if (photos.length === 0) {
+                photosGrid.innerHTML = `<p>Không tìm thấy ảnh nào.</p>`;
                 return;
             }
 
-            photosGrid.innerHTML = photos.map((photo, idx) => `
+            const displayList = photos.slice(0, 5);
+            photosGrid.innerHTML = displayList.map((photo, idx) => `
                 <div class="photo-card">
                     <img src="${photo.url}" alt="Photo ${idx + 1}" loading="lazy">
-                    <div class="photo-actions">
-                        <a href="${photo.url}" download="photo${photo.index || idx + 1}_session${session_id}.jpg" class="btn">
-                            ⬇️ Tải ảnh này / Download
-                        </a>
-                    </div>
                 </div>
             `).join('');
-
-            setupDownloadAll(session_id, photobooth, photos);
-        }
-
-        function setupDownloadAll(sessionId, photoboothUrl, photos) {
-            const btn = document.getElementById('downloadAll');
-            const allImages = [
-                ...(photoboothUrl ? [{ url: photoboothUrl, filename: `photobooth_session${sessionId}.jpg` }] : []),
-                ...photos.map((photo, idx) => ({
-                    url: photo.url,
-                    filename: photo.index
-                        ? `photo${photo.index}_session${sessionId}.jpg`
-                        : `photo${idx + 1}_session${sessionId}.jpg`
-                }))
-            ];
-
-            btn.onclick = async () => {
-                btn.disabled = true;
-                btn.textContent = '⏳ Đang nén ảnh...';
-
-                try {
-                    const zip = new JSZip();
-                    for (const image of allImages) {
-                        const response = await fetch(image.url);
-                        const blob = await response.blob();
-                        zip.file(image.filename, blob);
-                    }
-
-                    const content = await zip.generateAsync({ type: 'blob' });
-                    saveAs(content, `photobooth_session${sessionId}.zip`);
-                    btn.textContent = '✅ Đã tải xong!';
-                    setTimeout(() => {
-                        btn.disabled = false;
-                        btn.textContent = '⬇️ Tải xuống tất cả ảnh / Download All Photos';
-                    }, 2500);
-                } catch (error) {
-                    console.error(error);
-                    btn.textContent = '❌ Lỗi tải xuống';
-                    setTimeout(() => {
-                        btn.disabled = false;
-                        btn.textContent = '⬇️ Tải xuống tất cả ảnh / Download All Photos';
-                    }, 2500);
-                }
-            };
         }
 
         // Show error
@@ -332,10 +128,8 @@
                 }
                 
                 displayImages(manifest);
-                
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
-                
             } catch (error) {
                 showError('❌ Lỗi tải ảnh: ' + error.message);
             }
